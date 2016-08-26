@@ -1,6 +1,7 @@
 package com.jin.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -30,6 +31,12 @@ public class SimpleController {
 	@RequestMapping("/simple/start")	
 	public void start() {
 		simpleConsumer.start();
+	}
+	
+	@RequestMapping("/simple/concurrent/{concurrentConsumers}")
+	public void concurrentConsumer (@PathVariable("concurrentConsumers") int concurrentConsumers) {
+		
+		simpleConsumer.setConcurrentConsumer(concurrentConsumers);
 	}
 
 

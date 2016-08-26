@@ -24,6 +24,10 @@ public abstract class AbsJinConsumerImpl implements JinConsumer {
 	
 	private SimpleMessageListenerContainer simpleMessageListenerContainer;
 	
+	protected int maxConcurrentConsumers = 10;
+	protected int concurrentConsumers = 3; 
+
+	
 	@Autowired 
 	MQConfiguration mqConf;
 	
@@ -101,6 +105,14 @@ public abstract class AbsJinConsumerImpl implements JinConsumer {
 	public void stop() {
 		logger.info("We will stop the consumer: " + this.getClass());
 		simpleMessageListenerContainer.stop();
+	}
+	
+	public void setConcurrentConsumer(int concurrentConsumers) {
+		if (concurrentConsumers < maxConcurrentConsumers) {
+			simpleMessageListenerContainer.setConcurrentConsumers(concurrentConsumers);
+		} else {
+			simpleMessageListenerContainer.setConcurrentConsumers(maxConcurrentConsumers);
+		}
 	}
 
 }
