@@ -65,7 +65,7 @@ public abstract class AbsJinConsumerImpl implements JinConsumer {
 			
 			process(messageObj);
 		} catch(Exception e){
-			logger.error(e.getMessage());
+			logger.error("Failed to process the message " + queueMessage.getPayload().toString() + " The Exceptions is:  " + e.getMessage());
 			retry(messageObj, messageProperites);
 		}
 	}

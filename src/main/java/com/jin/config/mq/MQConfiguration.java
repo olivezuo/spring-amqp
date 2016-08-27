@@ -85,17 +85,15 @@ public class MQConfiguration
 	     }
 	};
 	
-	
+	@Bean
 	public TopicExchange workingExchange() {
 		TopicExchange topicExchange = new TopicExchange(exchange);
-		//rabbitAdmin().declareExchange(topicExchange);
 		return topicExchange;		
 	}
 
+	@Bean
 	public TopicExchange deadLetterExchange() {
 		TopicExchange topicExchange = new TopicExchange(deadLetterExchange);
-		//topicExchange.
-		//rabbitAdmin().declareExchange(topicExchange);
 		return topicExchange;		
 	}
 

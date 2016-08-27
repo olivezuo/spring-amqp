@@ -21,6 +21,7 @@ public class MessageReceiveServiceImpl implements MessageReceiveService {
 	@Autowired
 	MQConfiguration mqConf;
 		
+	@Override
 	public SimpleMessageListenerContainer simpleMessageListenerContainer(String queueName, String routingKey, int maxConcurrentConsumers, int concurrentConsumers, JinConsumer consumer ) {
 		
 		SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
@@ -29,10 +30,10 @@ public class MessageReceiveServiceImpl implements MessageReceiveService {
 		simpleMessageListenerContainer.setQueues(queue(queueName,routingKey));
 		simpleMessageListenerContainer.setMaxConcurrentConsumers(maxConcurrentConsumers);
 		simpleMessageListenerContainer.setConcurrentConsumers(concurrentConsumers);
-		simpleMessageListenerContainer.setMessageListener(exampleListener(consumer));
+		simpleMessageListenerContainer.setMessageListener(messageListener(consumer));
 		simpleMessageListenerContainer.setMessageConverter(mqConf.messageConverter());
 		simpleMessageListenerContainer.setAutoDeclare(true);
-		simpleMessageListenerContainer.setRabbitAdmin(mqConf.rabbitAdmin());
+		logger.info("Successfully create Message Listener Container for queue " + queueName + " with routing key " + routingKey);
 				
 		return simpleMessageListenerContainer;		
 	}
@@ -46,7 +47,7 @@ public class MessageReceiveServiceImpl implements MessageReceiveService {
 		
 	}
 	
-    public MessageListener exampleListener(JinConsumer consumer) {
+    protected MessageListener messageListener(JinConsumer consumer) {
         return new MessageListener() {
             public void onMessage(Message message) {
             	consumer.receive(message);
