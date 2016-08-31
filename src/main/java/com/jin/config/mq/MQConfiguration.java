@@ -34,7 +34,7 @@ public class MQConfiguration
 	@Bean
 	public ConnectionFactory defaultConnectionFactory() {
 	    CachingConnectionFactory cf = new CachingConnectionFactory();
-	    cf.setAddresses(this.props.getAddresses());
+	    cf.setHost(this.props.getHost());
 	    cf.setUsername(this.props.getUsername());
 	    cf.setPassword(this.props.getPassword());
 	    cf.setVirtualHost(this.props.getVirtualHost());
