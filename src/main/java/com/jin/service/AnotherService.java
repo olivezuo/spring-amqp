@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jin.message.AnotherMessage;
+import com.jin.queue.service.MessageSendServiceImpl;
 
 @Service
 public class AnotherService {
@@ -20,7 +21,6 @@ public class AnotherService {
 	
 	@PostConstruct
     public void init() {
-		//send();
 	}
 	
 	public void send() {

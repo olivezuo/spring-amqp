@@ -8,11 +8,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.jin.message.SimpleMessage;
-import com.jin.queue.QueueMessage;
+import com.jin.queue.service.MessageSendServiceImpl;
 
 @Service
 public class SimpleService {
 	private static final Logger logger = LoggerFactory.getLogger(SimpleService.class);
+	
+	private int messageCount;
 	
 	@Autowired
 	MessageSendServiceImpl messageSender;
@@ -21,14 +23,17 @@ public class SimpleService {
 	
 	@PostConstruct
     public void init() {
-		//send();
+
 	}
 	
 	public void send() {
+
 		messageSender.send("jin.simple", message);
 	}
 	
 	public void receive(SimpleMessage message) {
+		messageCount++;
+		logger.info("Total Number received " + messageCount);
 		logger.info("Receive a message: " + message.toString());
 	}
 	

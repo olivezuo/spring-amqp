@@ -1,4 +1,4 @@
-package com.jin.config.mq;
+package com.jin.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,13 +17,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.retry.RecoveryCallback;
 import org.springframework.retry.RetryContext;
 import org.springframework.retry.backoff.ExponentialBackOffPolicy;
+import org.springframework.retry.policy.SimpleRetryPolicy;
 import org.springframework.retry.support.RetryTemplate;
 
 @Configuration
 @ConfigurationProperties(prefix = "com.jin.queue")
-public class MQConfiguration 
+public class MQConfig 
 {	
-	private static final Logger logger = LoggerFactory.getLogger(MQConfiguration.class);
+	private static final Logger logger = LoggerFactory.getLogger(MQConfig.class);
 
 	@Autowired
 	private RabbitProperties props;
@@ -34,27 +35,32 @@ public class MQConfiguration
 	@Bean
 	public ConnectionFactory defaultConnectionFactory() {
 	    CachingConnectionFactory cf = new CachingConnectionFactory();
-	    cf.setHost(this.props.getHost());
+	    cf.setAddresses(this.props.getAddresses());
 	    cf.setUsername(this.props.getUsername());
 	    cf.setPassword(this.props.getPassword());
 	    cf.setVirtualHost(this.props.getVirtualHost());
 	    cf.setConnectionTimeout(1000);
+	    cf.setChannelCacheSize(100);
 	    return cf;
 	}
 		
 	@Bean
 	public RabbitTemplate rabbitTemplate() {
 	    RabbitTemplate template = new RabbitTemplate(defaultConnectionFactory());
+	    
 	    RetryTemplate retryTemplate = new RetryTemplate();
 	    ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
-	    backOffPolicy.setInitialInterval(500);
-	    backOffPolicy.setMultiplier(10.0);
+	    backOffPolicy.setInitialInterval(200);
+	    backOffPolicy.setMultiplier(2.0);
 	    backOffPolicy.setMaxInterval(100000);
 	    retryTemplate.setBackOffPolicy(backOffPolicy);
+	    
+	    SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
+	    retryPolicy.setMaxAttempts(5);
+	    retryTemplate.setRetryPolicy(retryPolicy);
+	    
 	    template.setRetryTemplate(retryTemplate);
-	    
-	    template.setRecoveryCallback(recoveryCallBack);
-	    
+	   // template.setRecoveryCallback(recoveryCallBack);
         template.setMessageConverter(messageConverter());
 	    
 	    return template;
