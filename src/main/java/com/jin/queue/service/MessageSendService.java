@@ -1,4 +1,4 @@
-package com.jin.service;
+package com.jin.queue.service;
 
 import org.springframework.amqp.core.MessageProperties;
 

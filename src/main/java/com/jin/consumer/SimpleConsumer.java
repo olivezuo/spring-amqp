@@ -24,10 +24,10 @@ public class SimpleConsumer extends AbsJinConsumerImpl{
 	public void init() {
 		String queueName = "jin.message.simple";
 		String routingKey = "jin.simple";
-		maxConcurrentConsumers = 10;
+		maxConcurrentConsumers = 20;
 		concurrentConsumers = 3; 
-				
 		startContainer(queueName, routingKey, maxConcurrentConsumers, concurrentConsumers);
+		logger.info("I am a new SimpleConsumer");
 	}
 
 	@Override
@@ -47,6 +47,7 @@ public class SimpleConsumer extends AbsJinConsumerImpl{
 
 	@Override
 	protected <T> void process(T message) {
+		
 		simpleService.receive((SimpleMessage)message);
 		
 	}
