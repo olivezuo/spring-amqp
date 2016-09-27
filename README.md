@@ -12,6 +12,6 @@ RabbitMQ is an open source Message Queue system. We are using message system to 
 3. API to manage the consumer: Stop, Start, Add/remove consumers.
 4. Deadletter implementation to retry the message.
 5. Send warning email for every failed message, publish or consume.
-6. Persist failed message, publish or consume.
-7. Retry failed message. 
+6. Persist failed message to MongoDB, publish or consume.
+7. Retry failed message. We use an API call here to show how it works. Actually it should integrate with a cron job framework to clean up the failed message as a cron job. 
 
