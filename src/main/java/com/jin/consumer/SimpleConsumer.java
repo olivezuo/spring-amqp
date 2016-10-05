@@ -24,9 +24,11 @@ public class SimpleConsumer extends AbsJinConsumerImpl{
 	public void init() {
 		String queueName = "jin.message.simple";
 		String routingKey = "jin.simple";
+		retryPrefix = "simple";
+		String retryRoutingKey = retryPrefix + "." + routingKey;
 		maxConcurrentConsumers = 20;
 		concurrentConsumers = 3; 
-		startContainer(queueName, routingKey, maxConcurrentConsumers, concurrentConsumers);
+		startContainer(queueName, routingKey, retryRoutingKey, maxConcurrentConsumers, concurrentConsumers);
 		logger.info("I am a new SimpleConsumer");
 	}
 

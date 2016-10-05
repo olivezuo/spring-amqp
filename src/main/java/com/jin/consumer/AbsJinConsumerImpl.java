@@ -32,6 +32,7 @@ public abstract class AbsJinConsumerImpl implements JinConsumer {
 	protected int maxConcurrentConsumers = 20;
 	protected int concurrentConsumers = 3; 
 
+	protected String retryPrefix ;
 	
 	@Autowired 
 	MQConfig mqConfig;
@@ -52,8 +53,8 @@ public abstract class AbsJinConsumerImpl implements JinConsumer {
 	
 	protected abstract <T> void process(T message);
 
-	protected void startContainer(String queueName, String routingKey, int maxConcurrentConsumers, int concurrentConsumers){
-		simpleMessageListenerContainer = messageReceiver.simpleMessageListenerContainer(queueName, routingKey,maxConcurrentConsumers, concurrentConsumers, this);
+	protected void startContainer(String queueName, String routingKey, String retryRoutingKey, int maxConcurrentConsumers, int concurrentConsumers){
+		simpleMessageListenerContainer = messageReceiver.simpleMessageListenerContainer(queueName, routingKey, retryRoutingKey, maxConcurrentConsumers, concurrentConsumers, this);
 		simpleMessageListenerContainer.start();
 	}
 	
@@ -72,7 +73,8 @@ public abstract class AbsJinConsumerImpl implements JinConsumer {
 			messageCount++;
 			logger.error("Total Number processed " + messageCount);
 			if (messageCount%3 == 0) {
-				throw new IOException("We fail one message out of three.");
+				channel.basicAck(messageProperites.getDeliveryTag(), false);
+				throw new Exception("We fail one message out of three.");
 			}
 			/* Keep in mind that if the message is not acked it will remain in unacked status.
 			 *  Once we restart the channel for the consumer, it will go back to the queue in ready status. 
@@ -93,15 +95,17 @@ public abstract class AbsJinConsumerImpl implements JinConsumer {
 	@Override
 	public <T> void retry(T message, MessageProperties messageProperties, String errorDetails) {
 		int currentRetryCount = 0;
+		String routingKey = messageProperties.getReceivedRoutingKey();
 		if (messageProperties.getHeaders().get("retry_count") != null){
-			currentRetryCount =(int)messageProperties.getHeaders().get("retry_count"); 
+			currentRetryCount =(int)messageProperties.getHeaders().get("retry_count"); 			
+		} else{
+			routingKey = retryPrefix + "." + routingKey;
 		}
 		int newRetryCount = currentRetryCount + 1;		
 		if (newRetryCount <= 5){
-			String routingKey = messageProperties.getReceivedRoutingKey();
-			String currentExpiration = "200"; 
-			if( messageProperties.getExpiration() != null){
-				currentExpiration = messageProperties.getExpiration();
+			String currentExpiration = "2000"; 
+			if( messageProperties.getHeaders().get("expiration") != null){
+				currentExpiration = (String)messageProperties.getHeaders().get("expiration");
 			}
 			int expiration = Integer.parseInt(currentExpiration);
 			String newExpiration = Integer.toString(newRetryCount * 5 * expiration);
@@ -109,13 +113,14 @@ public abstract class AbsJinConsumerImpl implements JinConsumer {
 			newMessageProperties.setDeliveryMode(MessageDeliveryMode.PERSISTENT);
 			newMessageProperties.setExpiration(newExpiration);
 			newMessageProperties.setHeader("retry_count", newRetryCount);
+			newMessageProperties.setHeader("expiration", newExpiration);
 			newMessageProperties.setConsumerQueue(messageProperties.getConsumerQueue());
 			messageSender.sendDeadLetter(routingKey, message, newMessageProperties);		
-			failedMessageMailer.send("We have retry the message 5 times but failed",errorDetails, message);			
+			//failedMessageMailer.send("We have retry the message 5 times but failed",errorDetails, message);			
 			messagePersistService.save(messageProperties.getReceivedExchange(), messageProperties.getReceivedRoutingKey(), message, errorDetails, "unprocess");
 
 		} else {
-			failedMessageMailer.send("We have retry the message 5 times but failed",errorDetails, message);			
+			//failedMessageMailer.send("We have retry the message 5 times but failed",errorDetails, message);			
 			messagePersistService.save(messageProperties.getReceivedExchange(), messageProperties.getReceivedRoutingKey(), message, errorDetails, "unprocess");
 			logger.error("Still can not process the message after 5 retry. The message is :" + message.toString());
 		}

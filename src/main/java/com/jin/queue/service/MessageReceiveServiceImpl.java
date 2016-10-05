@@ -24,12 +24,12 @@ public class MessageReceiveServiceImpl implements MessageReceiveService {
 	MQConfig mqConfig;
 		
 	@Override
-	public SimpleMessageListenerContainer simpleMessageListenerContainer(String queueName, String routingKey, int maxConcurrentConsumers, int concurrentConsumers, JinConsumer consumer ) {
+	public SimpleMessageListenerContainer simpleMessageListenerContainer(String queueName, String routingKey, String retryRoutingKey, int maxConcurrentConsumers, int concurrentConsumers, JinConsumer consumer ) {
 		
 		SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
 		
 		simpleMessageListenerContainer.setConnectionFactory(mqConfig.defaultConnectionFactory());
-		simpleMessageListenerContainer.setQueues(queue(queueName,routingKey));
+		simpleMessageListenerContainer.setQueues(queue(queueName,routingKey, retryRoutingKey));
 		simpleMessageListenerContainer.setMaxConcurrentConsumers(maxConcurrentConsumers);
 		simpleMessageListenerContainer.setConcurrentConsumers(concurrentConsumers);
 		simpleMessageListenerContainer.setMessageListener(messageListener(consumer));
@@ -41,11 +41,13 @@ public class MessageReceiveServiceImpl implements MessageReceiveService {
 		return simpleMessageListenerContainer;		
 	}
 	
-	public Queue queue(String queueName, String routingKey) {
+	public Queue queue(String queueName, String routingKey, String retryRoutingKey) {
 		Queue queue= new Queue(queueName, true);
 		Binding binding = BindingBuilder.bind(queue).to(mqConfig.workingExchange()).with(routingKey);
+		Binding retryBinding = BindingBuilder.bind(queue).to(mqConfig.workingExchange()).with(retryRoutingKey);
 		mqConfig.rabbitAdmin().declareQueue(queue);
 		mqConfig.rabbitAdmin().declareBinding(binding);
+		mqConfig.rabbitAdmin().declareBinding(retryBinding);
 		return queue;
 		
 	}

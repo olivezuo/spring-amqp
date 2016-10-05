@@ -3,6 +3,7 @@ package com.jin.domain;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.TimeZone;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -59,6 +60,7 @@ public class FailedMessage {
 		this.retried = false;
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 			String dateInString = "01-01-2000 00:00:00";
 			this.dateRetried = sdf.parse(dateInString);
 		} catch (ParseException e) {

@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,14 +24,36 @@ public class MessageRetryServiceImpl implements MessageRetryService {
 	MessageSendService messageSendService;
 	
 	@Override
-	public int retryAll() {		
-		List<FailedMessage> failedMessages = failedMessageRepository.findByRetried(false);
-		return retryAll(failedMessages);
+	public int retryAll() {
+		boolean working = true;
+		int count = 0;
+		while (working) {
+			List<FailedMessage> failedMessages = failedMessageRepository.findByRetried(false, new PageRequest(0, 3));
+			if (failedMessages.size() != 0){
+				logger.info("We get " + failedMessages.size() + " records");
+				retryAll(failedMessages);
+				count += failedMessages.size();
+			} else {
+				working = false;
+			}
+		}	
+		return count;
 	}
 	
 	public int retryByMessageType(String messageType) {
-		List<FailedMessage> failedMessages = failedMessageRepository.findByMessageTypeAndRetried(messageType, false);
-		return retryAll(failedMessages);
+		boolean working = true;
+		int count = 0;
+		while (working) {
+			List<FailedMessage> failedMessages = failedMessageRepository.findByMessageTypeAndRetried(messageType, false, new PageRequest(0, 3));
+			if (failedMessages.size() != 0){
+				logger.info("We get " + failedMessages.size() + " records");
+				retryAll(failedMessages);
+				count += failedMessages.size();
+			} else {
+				working = false;
+			}
+		}		
+		return count;	
 	}
 	
 	private int retryAll(List<FailedMessage> failedMessages) {

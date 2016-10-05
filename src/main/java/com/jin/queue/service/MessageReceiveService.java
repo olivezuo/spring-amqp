@@ -6,5 +6,5 @@ import com.jin.consumer.JinConsumer;
 
 public interface MessageReceiveService {
 
-	public SimpleMessageListenerContainer simpleMessageListenerContainer(String queueName, String routingKey, int maxConcurrentConsumers, int concurrentConsumers, JinConsumer consumer );
+	public SimpleMessageListenerContainer simpleMessageListenerContainer(String queueName, String routingKey, String retryRoutingKey, int maxConcurrentConsumers, int concurrentConsumers, JinConsumer consumer );
 }

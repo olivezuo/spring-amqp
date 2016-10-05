@@ -24,10 +24,12 @@ public class AnotherConsumer extends AbsJinConsumerImpl {
 	public void init() {
 		String queueName = "jin.message.another";
 		String routingKey = "jin.another";
+		retryPrefix = "another";
+		String retryRoutingKey = retryPrefix + "." + routingKey;
 		int maxConcurrentConsumers = 2;
 		int concurrentConsumers = 2; 
 				
-		startContainer(queueName, routingKey, maxConcurrentConsumers, concurrentConsumers);
+		startContainer(queueName, routingKey, retryRoutingKey, maxConcurrentConsumers, concurrentConsumers);
 	}
 
 	@Override
