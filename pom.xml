@@ -47,7 +47,7 @@
 			                  </goals>
 			                  <configuration>
 			                  <tasks>
-			                     <echo>Using env.test.properties</echo>
+			                     <echo>Using Environment Properties</echo>
 						            <copy file="config/application-${env}.properties" tofile
 								    ="${project.build.outputDirectory}/application.properties"/>
 								    <copy file="config/logback-spring-${env}.xml" tofile

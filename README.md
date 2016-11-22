@@ -1,6 +1,6 @@
 # spring-amqp
 
-This is an Spring-Amqp library that can be integrate with any spring boot project that need to use the message queue.
+This is an Spring-Amqp library that can be integrate with any spring boot project that need to use the message queue. The library isolate the usage details of a message queue system (Create new Queue, send message, consume message, retry message, manage queue, etc) from the business logic. Using this library the developer can focus only on the business logic and avoid the complexity to handle the queue. 
 
 ## RabbitMQ
 RabbitMQ is an open source Message Queue system. We are using message system to decouple the system and achieve the scalability and flexibility.
