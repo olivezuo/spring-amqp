@@ -1,37 +1,29 @@
-package com.jin.consumer;
+package com.jin.queue.consumer;
 
 import java.io.IOException;
-
-import javax.annotation.PreDestroy;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jin.config.MQConfig;
 import com.jin.mail.FailedMessageMailer;
 import com.jin.queue.QueueMessage;
+import com.jin.queue.config.MQConfig;
 import com.jin.queue.service.MessagePersistService;
-import com.jin.queue.service.MessageReceiveService;
+import com.jin.queue.service.MessageReceiveServiceImpl;
 import com.jin.queue.service.MessageSendService;
 import com.rabbitmq.client.Channel;
 
-public abstract class AbsJinConsumerImpl implements JinConsumer {
+public abstract class AbsJinConsumerImpl extends MessageReceiveServiceImpl {
 
 	private static final Logger logger = LoggerFactory.getLogger(AbsJinConsumerImpl.class);
 	
 	private int messageCount;
 	
-	private SimpleMessageListenerContainer simpleMessageListenerContainer;
-	
-	protected int maxConcurrentConsumers = 20;
-	protected int concurrentConsumers = 3; 
-
 	protected String retryPrefix ;
 	
 	@Autowired 
@@ -39,9 +31,6 @@ public abstract class AbsJinConsumerImpl implements JinConsumer {
 	
 	@Autowired
 	MessageSendService messageSender;
-	
-	@Autowired
-	MessageReceiveService messageReceiver;
 	
 	@Autowired
 	FailedMessageMailer failedMessageMailer;
@@ -52,15 +41,6 @@ public abstract class AbsJinConsumerImpl implements JinConsumer {
 	protected abstract <T> T getMessageObj(QueueMessage<T> queueMessage);
 	
 	protected abstract <T> void process(T message);
-
-	protected void startContainer(String queueName, String routingKey, String retryRoutingKey, int maxConcurrentConsumers, int concurrentConsumers){
-		simpleMessageListenerContainer = messageReceiver.simpleMessageListenerContainer(queueName, routingKey, retryRoutingKey, maxConcurrentConsumers, concurrentConsumers, this);
-		simpleMessageListenerContainer.start();
-	}
-	
-	public SimpleMessageListenerContainer getSimpleMessageListenerContainer() {
-		return simpleMessageListenerContainer;
-	}
 
 	@Override
 	public void receive(Message message, Channel channel) {
@@ -92,8 +72,7 @@ public abstract class AbsJinConsumerImpl implements JinConsumer {
 		}
 	}
 
-	@Override
-	public <T> void retry(T message, MessageProperties messageProperties, String errorDetails) {
+	protected <T> void retry(T message, MessageProperties messageProperties, String errorDetails) {
 		int currentRetryCount = 0;
 		String routingKey = messageProperties.getReceivedRoutingKey();
 		if (messageProperties.getHeaders().get("retry_count") != null){
@@ -126,22 +105,4 @@ public abstract class AbsJinConsumerImpl implements JinConsumer {
 		}
 	}
 	
-	public void start() {
-		simpleMessageListenerContainer.start();
-	}
-
-	@PreDestroy
-	public void stop() {
-		logger.info("We will stop the consumer: " + this.getClass());
-		simpleMessageListenerContainer.stop();
-	}
-	
-	public void setConcurrentConsumer(int concurrentConsumers) {
-		if (concurrentConsumers < maxConcurrentConsumers) {
-			simpleMessageListenerContainer.setConcurrentConsumers(concurrentConsumers);
-		} else {
-			simpleMessageListenerContainer.setConcurrentConsumers(maxConcurrentConsumers);
-		}
-	}
-
 }

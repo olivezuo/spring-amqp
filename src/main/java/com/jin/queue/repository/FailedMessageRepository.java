@@ -1,11 +1,11 @@
-package com.jin.repository;
+package com.jin.queue.repository;
 
 import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-import com.jin.domain.FailedMessage;
+import com.jin.queue.domain.FailedMessage;
 
 public interface FailedMessageRepository extends MongoRepository<FailedMessage, String> {
 

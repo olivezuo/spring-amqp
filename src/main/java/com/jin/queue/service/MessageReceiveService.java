@@ -1,10 +1,12 @@
 package com.jin.queue.service;
 
+import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 
-import com.jin.consumer.JinConsumer;
+import com.jin.business.consumer.JinConsumer;
+import com.rabbitmq.client.Channel;
 
 public interface MessageReceiveService {
 
-	public SimpleMessageListenerContainer simpleMessageListenerContainer(String queueName, String routingKey, String retryRoutingKey, int maxConcurrentConsumers, int concurrentConsumers, JinConsumer consumer );
+	public void receive(Message message, Channel channel);
 }

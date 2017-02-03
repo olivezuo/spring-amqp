@@ -1,4 +1,4 @@
-package com.jin.service;
+package com.jin.business.service;
 
 import javax.annotation.PostConstruct;
 
@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.jin.message.SimpleMessage;
+import com.jin.business.message.SimpleMessage;
 import com.jin.queue.service.MessageSendServiceImpl;
 
 @Service

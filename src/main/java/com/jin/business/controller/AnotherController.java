@@ -1,11 +1,11 @@
-package com.jin.controller;
+package com.jin.business.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jin.consumer.AnotherConsumer;
-import com.jin.service.AnotherService;
+import com.jin.business.consumer.AnotherConsumer;
+import com.jin.business.service.AnotherService;
 
 @RestController
 public class AnotherController {

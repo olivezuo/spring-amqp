@@ -1,4 +1,4 @@
-package com.jin.config;
+package com.jin.queue.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.mongo.MongoProperties;

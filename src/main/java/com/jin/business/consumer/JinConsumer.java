@@ -1,4 +1,4 @@
-package com.jin.consumer;
+package com.jin.business.consumer;
 
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageProperties;

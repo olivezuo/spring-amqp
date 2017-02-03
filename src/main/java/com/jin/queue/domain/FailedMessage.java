@@ -1,4 +1,4 @@
-package com.jin.domain;
+package com.jin.queue.domain;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

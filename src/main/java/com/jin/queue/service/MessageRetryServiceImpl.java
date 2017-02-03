@@ -10,8 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jin.domain.FailedMessage;
-import com.jin.repository.FailedMessageRepository;
+import com.jin.queue.domain.FailedMessage;
+import com.jin.queue.repository.FailedMessageRepository;
 
 @Service
 public class MessageRetryServiceImpl implements MessageRetryService {

@@ -1,4 +1,4 @@
-package com.jin.controller;
+package com.jin.business.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;

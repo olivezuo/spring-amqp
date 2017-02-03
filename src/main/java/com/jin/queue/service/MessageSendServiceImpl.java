@@ -16,9 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import com.jin.config.MQConfig;
 import com.jin.mail.FailedMessageMailer;
 import com.jin.queue.QueueMessage;
+import com.jin.queue.config.MQConfig;
 
 @Configuration
 @ConfigurationProperties(prefix = "com.jin.queue")

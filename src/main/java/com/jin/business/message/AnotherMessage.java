@@ -1,4 +1,4 @@
-package com.jin.message;
+package com.jin.business.message;
 
 public class AnotherMessage {
 	private String sport;

@@ -1,4 +1,4 @@
-package com.jin.consumer;
+package com.jin.business.consumer;
 
 import javax.annotation.PostConstruct;
 
@@ -8,9 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jin.message.AnotherMessage;
+import com.jin.business.message.AnotherMessage;
+import com.jin.business.service.AnotherService;
 import com.jin.queue.QueueMessage;
-import com.jin.service.AnotherService;
+import com.jin.queue.consumer.AbsJinConsumerImpl;
 
 @Service
 public class AnotherConsumer extends AbsJinConsumerImpl {

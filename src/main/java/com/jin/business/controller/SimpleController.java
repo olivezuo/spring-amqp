@@ -1,12 +1,12 @@
-package com.jin.controller;
+package com.jin.business.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.jin.consumer.SimpleConsumer;
-import com.jin.service.SimpleService;
+import com.jin.business.consumer.SimpleConsumer;
+import com.jin.business.service.SimpleService;
 
 @RestController
 public class SimpleController {

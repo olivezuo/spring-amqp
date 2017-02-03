@@ -1,4 +1,4 @@
-package com.jin.config;
+package com.jin.queue.config;
 
 import java.util.concurrent.Executor;
 
