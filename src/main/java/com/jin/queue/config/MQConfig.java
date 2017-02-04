@@ -7,8 +7,10 @@ import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitAdmin;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.ContentTypeDelegatingMessageConverter;
 import org.springframework.amqp.support.converter.DefaultJackson2JavaTypeMapper;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -31,6 +33,9 @@ public class MQConfig
 	
 	private String exchange;
 	private String deadLetterExchange;
+	private int maxRetryCount = 5 ;
+	private int initialExpiration = 400;
+	private int retryFactor = 4;
 	
 	@Bean
 	public ConnectionFactory defaultConnectionFactory() {
@@ -40,14 +45,12 @@ public class MQConfig
 	    cf.setPassword(this.props.getPassword());
 	    cf.setVirtualHost(this.props.getVirtualHost());
 	    cf.setConnectionTimeout(1000);
-	    cf.setChannelCacheSize(100);
 	    return cf;
 	}
 		
 	@Bean
 	public RabbitTemplate rabbitTemplate() {
 	    RabbitTemplate template = new RabbitTemplate(defaultConnectionFactory());
-	    
 	    RetryTemplate retryTemplate = new RetryTemplate();
 	    ExponentialBackOffPolicy backOffPolicy = new ExponentialBackOffPolicy();
 	    backOffPolicy.setInitialInterval(200);
@@ -58,9 +61,9 @@ public class MQConfig
 	    SimpleRetryPolicy retryPolicy = new SimpleRetryPolicy();
 	    retryPolicy.setMaxAttempts(5);
 	    retryTemplate.setRetryPolicy(retryPolicy);
-	    
-	    template.setRetryTemplate(retryTemplate);
-	   // template.setRecoveryCallback(recoveryCallBack);
+
+	    template.setRetryTemplate(retryTemplate);	    
+	    //template.setRecoveryCallback(recoveryCallBack);	    
         template.setMessageConverter(messageConverter());
 	    
 	    return template;
@@ -73,10 +76,15 @@ public class MQConfig
 	}
 	
 	@Bean
-	public Jackson2JsonMessageConverter messageConverter(){
-	    Jackson2JsonMessageConverter messageConverter = new Jackson2JsonMessageConverter();
-	    messageConverter.setClassMapper(new DefaultJackson2JavaTypeMapper());
-    
+	public MessageConverter messageConverter(){
+	    Jackson2JsonMessageConverter jackson2JsonMessageConverter = new Jackson2JsonMessageConverter();
+	    jackson2JsonMessageConverter.setClassMapper(new DefaultJackson2JavaTypeMapper());
+	    
+	    //return jackson2JsonMessageConverter;
+        ContentTypeDelegatingMessageConverter messageConverter = new ContentTypeDelegatingMessageConverter();
+        messageConverter.addDelegate("application/json", jackson2JsonMessageConverter);
+        //messageConverter.addDelegate("text/plain", new SimpleMessageConverter());
+	    
 	    return messageConverter;
 	}
 
@@ -119,5 +127,28 @@ public class MQConfig
 		this.deadLetterExchange = deadLetterExchange;
 	}
 
+	public int getMaxRetryCount() {
+		return maxRetryCount;
+	}
+
+	public void setMaxRetryCount(int maxRetryCount) {
+		this.maxRetryCount = maxRetryCount;
+	}
+
+	public int getInitialExpiration() {
+		return initialExpiration;
+	}
+
+	public void setInitialExpiration(int initialExpiration) {
+		this.initialExpiration = initialExpiration;
+	}
+
+	public int getRetryFactor() {
+		return retryFactor;
+	}
+
+	public void setRetryFactor(int retryFactor) {
+		this.retryFactor = retryFactor;
+	}
 
 }

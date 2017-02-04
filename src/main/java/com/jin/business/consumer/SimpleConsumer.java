@@ -29,17 +29,19 @@ public class SimpleConsumer extends AbsJinConsumerImpl{
 		String retryRoutingKey = retryPrefix + "." + routingKey;
 		maxConcurrentConsumers = 20;
 		concurrentConsumers = 3; 
-		startContainer(queueName, routingKey, retryRoutingKey, maxConcurrentConsumers, concurrentConsumers);
+		startMessageListenerContainer(queueName, routingKey, retryRoutingKey, maxConcurrentConsumers, concurrentConsumers);
 		logger.info("I am a new SimpleConsumer");
 	}
 
 	@Override
-	protected <T> T getMessageObj(QueueMessage<T> queueMessage) {
+	protected <T> T getMessageObj(T decodedMessage){
 		
 		SimpleMessage message = null;
+		ObjectMapper objectMapper = new ObjectMapper();
+		QueueMessage<?> queueMessage = objectMapper.convertValue(decodedMessage, QueueMessage.class);
+		
 		switch (queueMessage.type) {
 		case "com.jin.message.SimpleMessage":
-			ObjectMapper objectMapper = new ObjectMapper();
 			message = objectMapper.convertValue(queueMessage.getPayload(), SimpleMessage.class);
 			break;		
 		default:

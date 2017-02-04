@@ -19,7 +19,7 @@ public class SimpleService {
 	@Autowired
 	MessageSendServiceImpl messageSender;
 	
-	SimpleMessage message = new SimpleMessage("jin", "m", "122 denault");
+	SimpleMessage message = new SimpleMessage("jin", "m", "123 Disney");
 	
 	@PostConstruct
     public void init() {

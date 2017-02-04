@@ -30,16 +30,18 @@ public class AnotherConsumer extends AbsJinConsumerImpl {
 		int maxConcurrentConsumers = 2;
 		int concurrentConsumers = 2; 
 				
-		startContainer(queueName, routingKey, retryRoutingKey, maxConcurrentConsumers, concurrentConsumers);
+		startMessageListenerContainer(queueName, routingKey, retryRoutingKey, maxConcurrentConsumers, concurrentConsumers);
 	}
 
 	@Override
-	protected <T> T getMessageObj(QueueMessage<T> queueMessage) {
+	protected <T> T getMessageObj(T decodedMessage) {
 		
 		AnotherMessage message = null;
+		ObjectMapper objectMapper = new ObjectMapper();
+		QueueMessage<?> queueMessage = objectMapper.convertValue(decodedMessage, QueueMessage.class);
+
 		switch (queueMessage.type) {
 		case "com.jin.message.AnotherMessage":
-			ObjectMapper objectMapper = new ObjectMapper();
 			message = objectMapper.convertValue(queueMessage.getPayload(), AnotherMessage.class);
 			break;		
 		default:

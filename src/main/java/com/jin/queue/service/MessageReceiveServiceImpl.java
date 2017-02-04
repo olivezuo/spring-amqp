@@ -12,56 +12,55 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.ChannelAwareMessageListener;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 
 import com.jin.queue.config.MQConfig;
 import com.rabbitmq.client.Channel;
 
-@Configuration
+@Service
 public abstract class MessageReceiveServiceImpl implements MessageReceiveService {
 	private static final Logger logger = LoggerFactory.getLogger(MessageReceiveServiceImpl.class);
 	
 	@Autowired
-	MQConfig mqConfig;
+	MQConfig mqConf;
 	
-	protected SimpleMessageListenerContainer simpleMessageListenerContainer;
-	
-	protected int maxConcurrentConsumers = 20;
+	protected int maxConcurrentConsumers = 10;
 	protected int concurrentConsumers = 3; 
-	
-	protected void startContainer(String queueName, String routingKey, String retryRoutingKey, int maxConcurrentConsumers, int concurrentConsumers){
+
+	protected SimpleMessageListenerContainer simpleMessageListenerContainer;
+
+	protected void startMessageListenerContainer(String queueName, String routingKey, String retryRoutingKey, int maxConcurrentConsumers, int concurrentConsumers){
 		initSimpleMessageListenerContainer(queueName, routingKey, retryRoutingKey, maxConcurrentConsumers, concurrentConsumers);
+		// TODO add a flag to instantiate an consumer but not to start.
 		simpleMessageListenerContainer.start();
 	}
 	
-	protected void initSimpleMessageListenerContainer(String queueName, String routingKey, String retryRoutingKey, int maxConcurrentConsumers, int concurrentConsumers) {
-		
-		SimpleMessageListenerContainer simpleMessageListenerContainer = new SimpleMessageListenerContainer();
-		
-		simpleMessageListenerContainer.setConnectionFactory(mqConfig.defaultConnectionFactory());
-		simpleMessageListenerContainer.setQueues(queue(queueName,routingKey, retryRoutingKey));
+	protected void initSimpleMessageListenerContainer(String queueName, String routingKey, String retryRoutingKey, int maxConcurrentConsumers, int concurrentConsumers) {		
+		simpleMessageListenerContainer = new SimpleMessageListenerContainer();		
+		simpleMessageListenerContainer.setConnectionFactory(mqConf.defaultConnectionFactory());
+		simpleMessageListenerContainer.setQueues(queue(queueName, routingKey, retryRoutingKey));
 		simpleMessageListenerContainer.setMaxConcurrentConsumers(maxConcurrentConsumers);
 		simpleMessageListenerContainer.setConcurrentConsumers(concurrentConsumers);
 		simpleMessageListenerContainer.setMessageListener(messageListener());
-		simpleMessageListenerContainer.setMessageConverter(mqConfig.messageConverter());
+		simpleMessageListenerContainer.setMessageConverter(mqConf.messageConverter());
 		simpleMessageListenerContainer.setAutoDeclare(true);
 		simpleMessageListenerContainer.setAcknowledgeMode(AcknowledgeMode.MANUAL);
 		simpleMessageListenerContainer.setPrefetchCount(1);
-		logger.info("Successfully create Message Listener Container for queue " + queueName + " with routing key " + routingKey);				
+		logger.info("Successfully create Message Listener Container for queue " + queueName + " with routing key " + routingKey);
 	}
 	
 	public Queue queue(String queueName, String routingKey, String retryRoutingKey) {
 		Queue queue= new Queue(queueName, true);
-		Binding binding = BindingBuilder.bind(queue).to(mqConfig.workingExchange()).with(routingKey);
-		Binding retryBinding = BindingBuilder.bind(queue).to(mqConfig.workingExchange()).with(retryRoutingKey);
-		mqConfig.rabbitAdmin().declareQueue(queue);
-		mqConfig.rabbitAdmin().declareBinding(binding);
-		mqConfig.rabbitAdmin().declareBinding(retryBinding);
-		return queue;
-		
+		Binding binding = BindingBuilder.bind(queue).to(mqConf.workingExchange()).with(routingKey);
+		Binding retryBinding = BindingBuilder.bind(queue).to(mqConf.workingExchange()).with(retryRoutingKey);
+		mqConf.rabbitAdmin().declareQueue(queue);
+		mqConf.rabbitAdmin().declareBinding(binding);
+		mqConf.rabbitAdmin().declareBinding(retryBinding);
+		logger.info("Successfully declare queue " + queueName + " with routing key " + routingKey);
+		return queue;		
 	}
 	
-    protected ChannelAwareMessageListener messageListener() {
+    public ChannelAwareMessageListener messageListener() {
         return new ChannelAwareMessageListener() {
             public void onMessage(Message message, Channel channel) {
             	receive(message, channel);
@@ -69,7 +68,6 @@ public abstract class MessageReceiveServiceImpl implements MessageReceiveService
         };
     }
 
-	
 	public void start() {
 		simpleMessageListenerContainer.start();
 	}
@@ -99,5 +97,6 @@ public abstract class MessageReceiveServiceImpl implements MessageReceiveService
 			this.maxConcurrentConsumers = this.concurrentConsumers;
 		}
 	}
+
 
 }

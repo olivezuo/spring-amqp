@@ -20,7 +20,10 @@ public class FailedMessage {
 	
 	@Field
 	private String messageType;
-	
+
+	@Field
+	private String entityType;
+
 	@Field
 	private String message;
 	
@@ -48,9 +51,10 @@ public class FailedMessage {
 	@Indexed
 	private boolean retried;
 		
-	public FailedMessage(String messageType, String message, String routingKey, String exchange, String errorDetails, String failType) {
+	public FailedMessage(String messageType, String entityType, String message, String routingKey, String exchange, String errorDetails, String failType) {
 		super();
 		this.messageType = messageType;
+		this.entityType = entityType;
 		this.message = message;
 		this.routingKey = routingKey;
 		this.exchange = exchange;
@@ -60,12 +64,15 @@ public class FailedMessage {
 		this.retried = false;
 		try {
 			SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-			sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 			String dateInString = "01-01-2000 00:00:00";
 			this.dateRetried = sdf.parse(dateInString);
 		} catch (ParseException e) {
 			
 		}
+	}
+
+	public FailedMessage() {
+		
 	}
 
 	public String getId() {
@@ -82,6 +89,14 @@ public class FailedMessage {
 
 	public void setMessageType(String messageType) {
 		this.messageType = messageType;
+	}
+
+	public String getEntityType() {
+		return entityType;
+	}
+
+	public void setEntityType(String entityType) {
+		this.entityType = entityType;
 	}
 
 	public String getMessage() {
