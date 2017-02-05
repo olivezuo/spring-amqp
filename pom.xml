@@ -48,8 +48,8 @@
 			                  <configuration>
 			                  <tasks>
 			                     <echo>Using Environment Properties</echo>
-						            <copy file="config/application-${env}.properties" tofile
-								    ="${project.build.outputDirectory}/application.properties"/>
+						            <copy file="config/application-${env}.yml" tofile
+								    ="${project.build.outputDirectory}/application.yml"/>
 								    <copy file="config/logback-spring-${env}.xml" tofile
 								    ="${project.build.outputDirectory}/logback-spring.xml"/>
 			                  </tasks>

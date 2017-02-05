@@ -1,0 +1,29 @@
+com:
+  jin:
+    queue:
+      deadLetterExchange: test.deadLetter
+      exchange: test.working
+endpoints:
+  jmx:
+    domain: spring-amqp
+logging:
+  file: ./target/spring-amqp.log
+message:
+  failed:
+    mail:
+      from: jin.zuo@testsample.com
+      replyTo: jin.zuo@testsample.com
+      to: jin.zuo@testsample.com
+spring:
+  data:
+    mongodb:
+      database: jin
+      uri: mongodb://localhost:27017
+  mail:
+    host: test.testsample.com
+    port: 25
+  rabbitmq:
+    addresses: localhost
+    password: 123456
+    username: test
+    virtualHost: /jin

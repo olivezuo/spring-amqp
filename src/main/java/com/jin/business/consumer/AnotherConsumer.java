@@ -41,11 +41,11 @@ public class AnotherConsumer extends AbsJinConsumerImpl {
 		QueueMessage<?> queueMessage = objectMapper.convertValue(decodedMessage, QueueMessage.class);
 
 		switch (queueMessage.type) {
-		case "com.jin.message.AnotherMessage":
+		case "com.jin.business.message.AnotherMessage":
 			message = objectMapper.convertValue(queueMessage.getPayload(), AnotherMessage.class);
 			break;		
 		default:
-			logger.error("We receive the wrong message, the type of the message is " + queueMessage.type + ". But we are expecting com.jin.message.AnotheMessage");
+			logger.error("We receive the wrong message, the type of the message is " + queueMessage.type + ". But we are expecting com.jin.business.message.AnotheMessage");
 		}
 		return (T)message;
 	}
