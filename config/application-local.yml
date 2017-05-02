@@ -3,6 +3,11 @@ com:
     queue:
       deadLetterExchange: test.deadLetter
       exchange: test.working
+    async:
+      corePoolSize: 10
+      maxPoolSize: 50
+      queueCapacity: 1000
+      threadNamePrefix: Jin-Exec-
 endpoints:
   jmx:
     domain: spring-amqp
